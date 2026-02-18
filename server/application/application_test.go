@@ -1888,7 +1888,7 @@ func TestDeleteResourcesRBAC(t *testing.T) {
 
 	t.Run("delete with application permission", func(t *testing.T) {
 		_ = appServer.enf.SetBuiltinPolicy(`
-p, test-user, applications, delete, default/test-app, allow
+p, test-user, applications, delete, default/default/test-app, allow
 `)
 		_, err := appServer.DeleteResource(ctx, &req)
 		assert.Equal(t, codes.PermissionDenied.String(), status.Code(err).String())
@@ -1896,7 +1896,7 @@ p, test-user, applications, delete, default/test-app, allow
 
 	t.Run("delete with application permission with inheritance", func(t *testing.T) {
 		_ = appServerWithRBACInheritance.enf.SetBuiltinPolicy(`
-p, test-user, applications, delete, default/test-app, allow
+p, test-user, applications, delete, default/default/test-app, allow
 `)
 		_, err := appServerWithRBACInheritance.DeleteResource(ctx, &req)
 		assert.EqualError(t, err, expectedErrorWhenDeleteAllowed)
@@ -1904,8 +1904,8 @@ p, test-user, applications, delete, default/test-app, allow
 
 	t.Run("delete with application permission but deny subresource", func(t *testing.T) {
 		_ = appServer.enf.SetBuiltinPolicy(`
-p, test-user, applications, delete, default/test-app, allow
-p, test-user, applications, delete/*, default/test-app, deny
+p, test-user, applications, delete, default/default/test-app, allow
+p, test-user, applications, delete/*, default/default/test-app, deny
 `)
 		_, err := appServer.DeleteResource(ctx, &req)
 		assert.Equal(t, codes.PermissionDenied.String(), status.Code(err).String())
@@ -1913,8 +1913,8 @@ p, test-user, applications, delete/*, default/test-app, deny
 
 	t.Run("delete with application permission but deny subresource with inheritance", func(t *testing.T) {
 		_ = appServerWithRBACInheritance.enf.SetBuiltinPolicy(`
-p, test-user, applications, delete, default/test-app, allow
-p, test-user, applications, delete/*, default/test-app, deny
+p, test-user, applications, delete, default/default/test-app, allow
+p, test-user, applications, delete/*, default/default/test-app, deny
 `)
 		_, err := appServerWithRBACInheritance.DeleteResource(ctx, &req)
 		assert.EqualError(t, err, expectedErrorWhenDeleteAllowed)
@@ -1922,7 +1922,7 @@ p, test-user, applications, delete/*, default/test-app, deny
 
 	t.Run("delete with subresource", func(t *testing.T) {
 		_ = appServer.enf.SetBuiltinPolicy(`
-p, test-user, applications, delete/*, default/test-app, allow
+p, test-user, applications, delete/*, default/default/test-app, allow
 `)
 		_, err := appServer.DeleteResource(ctx, &req)
 		assert.EqualError(t, err, expectedErrorWhenDeleteAllowed)
@@ -1930,8 +1930,8 @@ p, test-user, applications, delete/*, default/test-app, allow
 
 	t.Run("delete with subresource but deny applications", func(t *testing.T) {
 		_ = appServer.enf.SetBuiltinPolicy(`
-p, test-user, applications, delete, default/test-app, deny
-p, test-user, applications, delete/*, default/test-app, allow
+p, test-user, applications, delete, default/default/test-app, deny
+p, test-user, applications, delete/*, default/default/test-app, allow
 `)
 		_, err := appServer.DeleteResource(ctx, &req)
 		assert.EqualError(t, err, expectedErrorWhenDeleteAllowed)
@@ -1939,8 +1939,8 @@ p, test-user, applications, delete/*, default/test-app, allow
 
 	t.Run("delete with subresource but deny applications with inheritance", func(t *testing.T) {
 		_ = appServerWithRBACInheritance.enf.SetBuiltinPolicy(`
-p, test-user, applications, delete, default/test-app, deny
-p, test-user, applications, delete/*, default/test-app, allow
+p, test-user, applications, delete, default/default/test-app, deny
+p, test-user, applications, delete/*, default/default/test-app, allow
 `)
 		_, err := appServerWithRBACInheritance.DeleteResource(ctx, &req)
 		assert.EqualError(t, err, expectedErrorWhenDeleteAllowed)
@@ -1948,8 +1948,8 @@ p, test-user, applications, delete/*, default/test-app, allow
 
 	t.Run("delete with specific subresource denied", func(t *testing.T) {
 		_ = appServer.enf.SetBuiltinPolicy(`
-p, test-user, applications, delete/*, default/test-app, allow
-p, test-user, applications, delete/fake.io/PodTest/*, default/test-app, deny
+p, test-user, applications, delete/*, default/default/test-app, allow
+p, test-user, applications, delete/fake.io/PodTest/*, default/default/test-app, deny
 `)
 		_, err := appServer.DeleteResource(ctx, &req)
 		assert.Equal(t, codes.PermissionDenied.String(), status.Code(err).String())
@@ -1981,7 +1981,7 @@ func TestPatchResourcesRBAC(t *testing.T) {
 
 	t.Run("patch with application permission", func(t *testing.T) {
 		_ = appServer.enf.SetBuiltinPolicy(`
-p, test-user, applications, update, default/test-app, allow
+p, test-user, applications, update, default/default/test-app, allow
 `)
 		_, err := appServer.PatchResource(ctx, &req)
 		assert.Equal(t, codes.PermissionDenied.String(), status.Code(err).String())
@@ -1989,7 +1989,7 @@ p, test-user, applications, update, default/test-app, allow
 
 	t.Run("patch with application permission with inheritance", func(t *testing.T) {
 		_ = appServerWithRBACInheritance.enf.SetBuiltinPolicy(`
-p, test-user, applications, update, default/test-app, allow
+p, test-user, applications, update, default/default/test-app, allow
 `)
 		_, err := appServerWithRBACInheritance.PatchResource(ctx, &req)
 		assert.EqualError(t, err, expectedErrorWhenUpdateAllowed)
@@ -1997,8 +1997,8 @@ p, test-user, applications, update, default/test-app, allow
 
 	t.Run("patch with application permission but deny subresource", func(t *testing.T) {
 		_ = appServer.enf.SetBuiltinPolicy(`
-p, test-user, applications, update, default/test-app, allow
-p, test-user, applications, update/*, default/test-app, deny
+p, test-user, applications, update, default/default/test-app, allow
+p, test-user, applications, update/*, default/default/test-app, deny
 `)
 		_, err := appServer.PatchResource(ctx, &req)
 		assert.Equal(t, codes.PermissionDenied.String(), status.Code(err).String())
@@ -2006,8 +2006,8 @@ p, test-user, applications, update/*, default/test-app, deny
 
 	t.Run("patch with application permission but deny subresource with inheritance", func(t *testing.T) {
 		_ = appServerWithRBACInheritance.enf.SetBuiltinPolicy(`
-p, test-user, applications, update, default/test-app, allow
-p, test-user, applications, update/*, default/test-app, deny
+p, test-user, applications, update, default/default/test-app, allow
+p, test-user, applications, update/*, default/default/test-app, deny
 `)
 		_, err := appServerWithRBACInheritance.PatchResource(ctx, &req)
 		assert.EqualError(t, err, expectedErrorWhenUpdateAllowed)
@@ -2015,7 +2015,7 @@ p, test-user, applications, update/*, default/test-app, deny
 
 	t.Run("patch with subresource", func(t *testing.T) {
 		_ = appServer.enf.SetBuiltinPolicy(`
-p, test-user, applications, update/*, default/test-app, allow
+p, test-user, applications, update/*, default/default/test-app, allow
 `)
 		_, err := appServer.PatchResource(ctx, &req)
 		assert.EqualError(t, err, expectedErrorWhenUpdateAllowed)
@@ -2023,8 +2023,8 @@ p, test-user, applications, update/*, default/test-app, allow
 
 	t.Run("patch with subresource but deny applications", func(t *testing.T) {
 		_ = appServer.enf.SetBuiltinPolicy(`
-p, test-user, applications, update, default/test-app, deny
-p, test-user, applications, update/*, default/test-app, allow
+p, test-user, applications, update, default/default/test-app, deny
+p, test-user, applications, update/*, default/default/test-app, allow
 `)
 		_, err := appServer.PatchResource(ctx, &req)
 		assert.EqualError(t, err, expectedErrorWhenUpdateAllowed)
@@ -2032,8 +2032,8 @@ p, test-user, applications, update/*, default/test-app, allow
 
 	t.Run("patch with subresource but deny applications with inheritance", func(t *testing.T) {
 		_ = appServerWithRBACInheritance.enf.SetBuiltinPolicy(`
-p, test-user, applications, update, default/test-app, deny
-p, test-user, applications, update/*, default/test-app, allow
+p, test-user, applications, update, default/default/test-app, deny
+p, test-user, applications, update/*, default/default/test-app, allow
 `)
 		_, err := appServerWithRBACInheritance.PatchResource(ctx, &req)
 		assert.EqualError(t, err, expectedErrorWhenUpdateAllowed)
@@ -2041,8 +2041,8 @@ p, test-user, applications, update/*, default/test-app, allow
 
 	t.Run("patch with specific subresource denied", func(t *testing.T) {
 		_ = appServer.enf.SetBuiltinPolicy(`
-p, test-user, applications, update/*, default/test-app, allow
-p, test-user, applications, update/fake.io/PodTest/*, default/test-app, deny
+p, test-user, applications, update/*, default/default/test-app, allow
+p, test-user, applications, update/fake.io/PodTest/*, default/default/test-app, deny
 `)
 		_, err := appServer.PatchResource(ctx, &req)
 		assert.Equal(t, codes.PermissionDenied.String(), status.Code(err).String())
@@ -2784,7 +2784,7 @@ func TestUpdateAppProject(t *testing.T) {
 	appServer.enf.SetDefaultRole("")
 
 	t.Run("update without changing project", func(t *testing.T) {
-		_ = appServer.enf.SetBuiltinPolicy(`p, admin, applications, update, default/test-app, allow`)
+		_ = appServer.enf.SetBuiltinPolicy(`p, admin, applications, update, default/default/test-app, allow`)
 		_, err := appServer.Update(ctx, &application.ApplicationUpdateRequest{Application: testApp})
 		require.NoError(t, err)
 	})
@@ -2797,8 +2797,8 @@ func TestUpdateAppProject(t *testing.T) {
 
 	t.Run("cannot change projects without create privileges", func(t *testing.T) {
 		_ = appServer.enf.SetBuiltinPolicy(`
-p, admin, applications, update, default/test-app, allow
-p, admin, applications, update, my-proj/test-app, allow
+p, admin, applications, update, default/default/test-app, allow
+p, admin, applications, update, my-proj/default/test-app, allow
 `)
 		_, err := appServer.Update(ctx, &application.ApplicationUpdateRequest{Application: testApp})
 		statusErr := grpc.UnwrapGRPCStatus(err)
@@ -2808,8 +2808,8 @@ p, admin, applications, update, my-proj/test-app, allow
 
 	t.Run("cannot change projects without update privileges in new project", func(t *testing.T) {
 		_ = appServer.enf.SetBuiltinPolicy(`
-p, admin, applications, update, default/test-app, allow
-p, admin, applications, create, my-proj/test-app, allow
+p, admin, applications, update, default/default/test-app, allow
+p, admin, applications, create, my-proj/default/test-app, allow
 `)
 		_, err := appServer.Update(ctx, &application.ApplicationUpdateRequest{Application: testApp})
 		assert.Equal(t, codes.PermissionDenied, status.Code(err))
@@ -2817,8 +2817,8 @@ p, admin, applications, create, my-proj/test-app, allow
 
 	t.Run("cannot change projects without update privileges in old project", func(t *testing.T) {
 		_ = appServer.enf.SetBuiltinPolicy(`
-p, admin, applications, create, my-proj/test-app, allow
-p, admin, applications, update, my-proj/test-app, allow
+p, admin, applications, create, my-proj/default/test-app, allow
+p, admin, applications, update, my-proj/default/test-app, allow
 `)
 		_, err := appServer.Update(ctx, &application.ApplicationUpdateRequest{Application: testApp})
 		statusErr := grpc.UnwrapGRPCStatus(err)
@@ -2829,9 +2829,9 @@ p, admin, applications, update, my-proj/test-app, allow
 	t.Run("can update project with proper permissions", func(t *testing.T) {
 		// Verify can update project with proper permissions
 		_ = appServer.enf.SetBuiltinPolicy(`
-p, admin, applications, update, default/test-app, allow
-p, admin, applications, create, my-proj/test-app, allow
-p, admin, applications, update, my-proj/test-app, allow
+p, admin, applications, update, default/default/test-app, allow
+p, admin, applications, create, my-proj/default/test-app, allow
+p, admin, applications, update, my-proj/default/test-app, allow
 `)
 		updatedApp, err := appServer.Update(ctx, &application.ApplicationUpdateRequest{Application: testApp})
 		require.NoError(t, err)
