@@ -358,22 +358,25 @@ func (proj *AppProject) RemoveGroupFromRole(roleName, group string) (bool, error
 	return false, nil
 }
 
+// normalizeUniquePolicies normalizes and deduplicates a slice of policy strings.
+func normalizeUniquePolicies(policies []string, namespace string) []string {
+	watched := make(map[string]struct{}, len(policies))
+	result := make([]string, 0, len(policies))
+	for _, policy := range policies {
+		normalized := rbac.NormalizePolicy(policy, namespace)
+		if _, ok := watched[normalized]; ok {
+			continue
+		}
+		watched[normalized] = struct{}{}
+		result = append(result, normalized)
+	}
+	return result
+}
+
 // NormalizePolicies normalizes the policies in the project
 func (proj *AppProject) NormalizePolicies() {
 	for i, role := range proj.Spec.Roles {
-		var normalizedPolicies []string
-		seen := make(map[string]struct{})
-		for _, policy := range role.Policies {
-			normalizedPolicy := rbac.NormalizePolicy(policy, proj.Namespace)
-
-			if _, ok := seen[normalizedPolicy]; ok {
-				continue
-			}
-
-			seen[normalizedPolicy] = struct{}{}
-			normalizedPolicies = append(normalizedPolicies, normalizedPolicy)
-		}
-		proj.Spec.Roles[i].Policies = normalizedPolicies
+		proj.Spec.Roles[i].Policies = normalizeUniquePolicies(role.Policies, proj.Namespace)
 	}
 }
 
@@ -384,17 +387,7 @@ func (proj *AppProject) ProjectPoliciesString() string {
 		projectPolicy := fmt.Sprintf("p, proj:%s:%s, projects, get, %s, allow", proj.Name, role.Name, proj.Name)
 		policies = append(policies, projectPolicy)
 
-		seen := make(map[string]struct{})
-		for _, policy := range role.Policies {
-			normalizedPolicy := rbac.NormalizePolicy(policy, proj.Namespace)
-
-			if _, ok := seen[normalizedPolicy]; ok {
-				continue
-			}
-
-			seen[normalizedPolicy] = struct{}{}
-			policies = append(policies, normalizedPolicy)
-		}
+		policies = append(policies, normalizeUniquePolicies(role.Policies, proj.Namespace)...)
 
 		for _, groupName := range role.Groups {
 			policies = append(policies, fmt.Sprintf("g, %s, proj:%s:%s", groupName, proj.Name, role.Name))
